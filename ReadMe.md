@@ -122,7 +122,7 @@ A: Yes, pickup fees will follow the store’s currency settings.
 
 If you encounter any issues or need feature requests, please contact:  
 **Email:** emkiarie0@gmail.com  
-**GitHub:** [https://github.com/Eric-Muthemba/Pickup-Mtaani](https://github.com/Eric-Muthemba/Pickup-Mtaani)
+**GitHub:** [https://github.com/Eric-Muthemba/Pickup-Mtaani](https://github.com/Eric-Muthemba/Pick-Up-Mtaani-WooCommerce-Plugin)
 
 ---
 
