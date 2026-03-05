@@ -1,42 +1,28 @@
 <?php
 /**
- * Plugin Name: Pickup Mtaani for WooCommerce
- * Description: Pickup Mtaani integration with map selection, validation, package creation and tracking.
+ * Plugin Name: Pickup Mtaani
+ * Description: WooCommerce Pickup Mtaani Integration
  * Version: 1.0.0
- * Developer: Eric Muthemba Kiarie
- * Email: emkiarie0@gmail.com
+ * Author: Eric Muthemba
  */
 
-use PickupMtaani\Cron;
+if (!defined('ABSPATH')) {
+    exit;
+}
 
-
-if (!defined('ABSPATH')) exit;
-
-define('PM_VERSION', '1.0.0');
+// Define constants
 define('PM_PATH', plugin_dir_path(__FILE__));
 define('PM_URL', plugin_dir_url(__FILE__));
 
-register_activation_hook(__FILE__, ['PickupMtaani\Cron', 'activate']);
-register_deactivation_hook(__FILE__, ['PickupMtaani\Cron', 'deactivate']);
+// Load core classes
+require_once PM_PATH . 'includes/class-plugin.php';
+require_once PM_PATH . 'includes/class-cron.php';
 
-/**
- * Ensure WooCommerce exists
- */
+// Initialize plugin
 add_action('plugins_loaded', function () {
-
-    if (!class_exists('WooCommerce')) {
-        add_action('admin_notices', function () {
-            echo '<div class="error"><p>Pickup Mtaani requires WooCommerce.</p></div>';
-        });
-        return;
-    }
-
-    require_once PM_PATH . 'includes/class-plugin.php';
-
-    PickupMtaani\Plugin::init();
+    new PM_Plugin();
 });
 
-
-add_action('plugins_loaded', function () {
-    Cron::init();
-});
+// Register activation/deactivation hooks
+register_activation_hook(__FILE__, ['PM_Cron', 'activate']);
+register_deactivation_hook(__FILE__, ['PM_Cron', 'deactivate']);

@@ -5,8 +5,14 @@ if (!defined('ABSPATH')) {
 
 class PM_Tracking
 {
+    private static $hooks_registered = false;
+
     public function __construct()
     {
+        if (self::$hooks_registered) {
+            return;
+        }
+
         // Show tracking in admin order page
         add_action('add_meta_boxes', [$this, 'add_tracking_metabox']);
 
@@ -15,6 +21,8 @@ class PM_Tracking
 
         // Save tracking when shipment is created
         add_action('pm_shipment_created', [$this, 'store_tracking'], 10, 2);
+
+        self::$hooks_registered = true;
     }
 
     /**
