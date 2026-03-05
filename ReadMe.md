@@ -4,128 +4,106 @@
 **Author:** Eric Muthemba Kiarie  
 **License:** GPL-3.0
 
-**Description:**  
-This is a WooCommerce plugin designed to provide a seamless "local pickup" experience for Kenyan e-commerce stores. Customers can select nearby pickup points (“mtaani” meaning neighborhood in Swahili) at checkout, and merchants can manage multiple pickup locations across various neighborhoods. The plugin ensures a smooth logistics experience for both merchants and customers.
+## Description
+Pickup Mtaani for WooCommerce integrates Pickup Mtaani shipping into checkout.
+Customers can choose either:
+- `Pickup from Agent`
+- `Doorstep Dropoff`
 
----
+The plugin validates the Pickup Mtaani API key before enabling the shipping method and prevents activation when validation fails.
 
 ## Features
-
-- **Neighborhood Pickup Locations**: Allow customers to select pickup points near their location.
-- **Customizable Pickup Points**: Admins can create, update, and delete pickup points with details like address, working hours, and contact info.
-- **WooCommerce Checkout Integration**: Pickup options are integrated directly into the WooCommerce checkout flow.
-- **Delivery Fee Configuration**: Set custom pickup fees per location or globally.
-- **Pickup Instructions**: Option to add custom instructions for each pickup point.
-- **Neighborhood Filtering**: Customers see only the pickup points relevant to their selected city or region.
-- **Notifications**: Send confirmation emails or SMS (if integrated) for selected pickup points.
-- **Admin Dashboard**: View pickup orders, manage locations, and track usage metrics.
-- **Lightweight & Extensible**: Built with performance and future integrations in mind.
-
----
+- WooCommerce shipping method: `Pickup Mtaani`
+- Checkout delivery mode selector:
+  - `Pickup from Agent`
+  - `Doorstep Dropoff`
+- Pickup agent map selector (Google Maps) for pickup mode
+- API key validation on settings save before activation
+- Clear admin error reason when API key validation fails
+- Order shipment creation on order processing
+- Dashboard widget for in-transit Pickup Mtaani shipments
 
 ## Requirements
-
 - WordPress 6.0+
 - WooCommerce 7.0+
 - PHP 8.0+
-
----
+- Pickup Mtaani production API key
+- Google Maps API key (for pickup map UI)
 
 ## Installation
-
 ### 1. Upload via WordPress Admin
-
 1. Go to `Plugins > Add New > Upload Plugin`
-2. Select the `pickup-mtaani.zip` file
-3. Click `Install Now` and then `Activate`
+2. Select the plugin zip
+3. Click `Install Now` and `Activate`
 
 ### 2. Upload via FTP
-
-1. Extract the plugin folder to `/wp-content/plugins/pickup-mtaani/`
-2. Go to `Plugins` in WordPress Admin and activate the plugin
-
----
+1. Extract plugin folder into `/wp-content/plugins/pickup-mtaani/`
+2. Activate in `Plugins`
 
 ## Configuration
+1. Go to `WooCommerce > Settings > Shipping > Shipping Zones`
+2. Add shipping method: `Pickup Mtaani`
+3. Open the method settings and configure:
+   - `Enable Pickup Mtaani Shipping`
+   - `Method Title`
+   - `API Key`
+   - `Google Maps API Key`
+4. Save settings
 
-1. Navigate to `WooCommerce > Settings > Pickup Mtaani`
-2. Add your pickup locations:
-    - **Location Name** – Name of the pickup point
-    - **Address** – Physical address
-    - **Neighborhood/City** – For filtering at checkout
-    - **Pickup Fee** – Optional fee for this location
-    - **Operating Hours** – Optional
-3. Enable “Pickup Mtaani” as a shipping method in WooCommerce:
-    - `WooCommerce > Settings > Shipping > Shipping Zones`
-    - Add a new method: **Pickup Mtaani**
-
----
+### API key validation behavior
+- When enabled is checked and settings are saved, the plugin verifies the API key first.
+- If verification fails, the method is not activated and an admin error is shown with the failure reason.
 
 ## Usage
+### Customer checkout flow
+1. Customer selects `Pickup Mtaani` shipping method.
+2. Customer selects delivery option:
+   - `Pickup from Agent`: choose an agent on the map.
+   - `Doorstep Dropoff`: no agent selection required.
+3. Customer completes checkout.
 
-### Customer Checkout Flow
+### Order fulfillment flow
+- On order status `processing`, the plugin creates a Pickup Mtaani shipment.
+- For `Pickup from Agent`, payload includes selected pickup agent.
+- For `Doorstep Dropoff`, payload uses doorstep shipment path.
 
-1. Customer selects a product and proceeds to checkout.
-2. In the shipping method section, they select **Pickup Mtaani**.
-3. A dropdown of nearby pickup points is displayed based on their city or neighborhood.
-4. Customer selects their preferred pickup point and completes the order.
+## API behavior
+- Production-only base URL: `https://api.pickupmtaani.com`
+- No sandbox mode in current implementation.
 
-### Admin Management
+### Endpoints used
+- Credential validation: `/locations/agents`
+- Agent listing for checkout map: `/locations/agents`
+- Pickup shipment: `/packages/agent-agent`
+- Doorstep shipment default: `/packages/doorstep-package`
+- Tracking: `/packages/track/{tracking_number}`
 
-- View orders with pickup location details in `WooCommerce > Orders`.
-- Update pickup point availability or instructions as needed.
+### Filters
+- `pm_doorstep_shipment_endpoint`
+  - Override doorstep shipment endpoint if your account uses a different route.
 
----
+## Admin dashboard widget
+The plugin registers a dashboard widget via `wp_dashboard_setup` and displays in:
+- `Dashboard > Home` (`/wp-admin/index.php`)
 
-## Developer Notes
-
-- The plugin is designed with extendibility in mind.
-- Hooks & Filters:
-    - `pickup_mtaani_get_locations` – Filter pickup locations dynamically.
-    - `pickup_mtaani_checkout_display` – Modify how pickup options display on checkout.
-- The plugin uses **custom post types** to manage pickup locations.
-
----
-
-## Screenshots
-
-1. **Pickup Locations Dashboard**
-2. **Checkout Pickup Selection Dropdown**
-3. **Pickup Point Settings**
-
-
----
-
-## Frequently Asked Questions (FAQ)
-
-**Q: Can I charge different fees for different pickup points?**  
-A: Yes, the plugin supports per-location pickup fees.
-
-**Q: Can I restrict pickup points by city?**  
-A: Yes, the plugin filters locations based on the customer’s city or neighborhood.
-
-**Q: Is the plugin compatible with multi-currency WooCommerce stores?**  
-A: Yes, pickup fees will follow the store’s currency settings.
-
----
+Widget title:
+- `Pickup Mtaani - Shipments In Transit`
 
 ## Changelog
+### 1.0.0
+- Initial WooCommerce integration
+- Shipping method support
+- Shipment creation and tracking hooks
 
-**1.0.0** – Initial release
-- Added neighborhood pickup feature
-- Integrated with WooCommerce checkout
-- Added admin management of pickup locations
-
----
+### Current implementation updates
+- Added API key verification before activation
+- Added explicit validation error reason on save
+- Added checkout delivery option: pickup agent or doorstep dropoff
+- Removed sandbox environment from settings and runtime (production only)
 
 ## Support
-
-If you encounter any issues or need feature requests, please contact:  
-**Email:** emkiarie0@gmail.com  
-**GitHub:** [https://github.com/Eric-Muthemba/Pick-Up-Mtaani-WooCommerce-Plugin](https://github.com/Eric-Muthemba/Pick-Up-Mtaani-WooCommerce-Plugin)
-
----
+- Email: `emkiarie0@gmail.com`
+- GitHub: `https://github.com/Eric-Muthemba/Pick-Up-Mtaani-WooCommerce-Plugin`
 
 ## License
-
-This plugin is licensed under the [GPL-3.0 License](https://www.gnu.org/licenses/gpl-3.0.html).  
+GPL-3.0
